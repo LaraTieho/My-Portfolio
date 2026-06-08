@@ -9,7 +9,7 @@ A professional portfolio website built with vanilla HTML5, CSS3, and JavaScript,
 
 ## Live Demo
 
-🔗 **[tieholara.github.io](https://tieholara.github.io)** *(update with your GitHub Pages URL once deployed)*
+🔗 **[tieholara.github.io]([https://tieholara.github.io](https://my-portfolio-tlara.vercel.app/))** 
 
 ---
 
