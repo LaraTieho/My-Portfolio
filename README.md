@@ -7,6 +7,12 @@ A professional portfolio website built with vanilla HTML5, CSS3, and JavaScript,
 
 ---
 
+## Live Demo
+
+🔗 **[tieholara.github.io](https://tieholara.github.io)** *(update with your GitHub Pages URL once deployed)*
+
+---
+
 ## Features
 
 - **3D animated hero** — Three.js particle field with mouse-parallax effect
@@ -154,4 +160,3 @@ npx serve .
 ## Licence
 
 © 2026 Tieho Lara. All rights reserved. This repository is publicly visible for portfolio purposes. Please do not reuse the content, copy, or photographs without permission.
-

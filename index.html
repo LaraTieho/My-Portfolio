@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tieho Lara — GIS Consultant &amp; Geomatics Professional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== CSS CUSTOM PROPERTIES ===== */
+    :root {
+      --primary:     #90C13E;
+      --primary-dark:#659A41;
+      --neutral:     #58595B;
+      --bg-base:     #0A0A0A;
+      --bg-surface:  #111111;
+      --bg-glass:    rgba(255,255,255,0.04);
+      --border-glass:rgba(144,193,62,0.15);
+      --text-primary:#F0F0F0;
+      --text-body:   #B0B0B0;
+      --text-muted:  #6B6B6B;
+      --gradient-primary: linear-gradient(135deg, #90C13E 0%, #659A41 100%);
+      --gradient-hero: linear-gradient(135deg, #0A0A0A 0%, #0f1a0a 50%, #0A0A0A 100%);
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--bg-base); color: var(--text-body); font-family: 'Inter', sans-serif; }
+    h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-dark); }
+    img { max-width: 100%; display: block; }
+    button { font-family: inherit; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 120px 0; }
+
+    .section-label {
+      color: var(--primary); font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 0.75rem;
+    }
+
+    /* ===== CUSTOM CURSOR ===== */
+    .cursor-outer {
+      width: 32px; height: 32px;
+      border: 2px solid var(--primary); border-radius: 50%;
+      position: fixed; top: 0; left: 0; pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease, opacity 0.3s;
+      z-index: 99999;
+    }
+    .cursor-outer.hovered { transform: translate(-50%, -50%) scale(1.5); opacity: 0.6; }
+    .cursor-inner {
+      width: 8px; height: 8px; background: var(--primary);
+      border-radius: 50%; position: fixed; top: 0; left: 0;
+      pointer-events: none; transform: translate(-50%, -50%); z-index: 99999;
+    }
+
+    /* ===== LOADING OVERLAY ===== */
+    #loading-overlay {
+      position: fixed; inset: 0; z-index: 9999; background: var(--bg-base);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;
+      transition: opacity 0.5s ease;
+    }
+    .loading-monogram {
+      font-family: 'Space Grotesk', sans-serif; font-size: 4rem; font-weight: 700; color: var(--primary);
+      animation: pulse-glow 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes pulse-glow {
+      from { text-shadow: 0 0 20px var(--primary); }
+      to   { text-shadow: 0 0 60px var(--primary); }
+    }
+    .loading-bar-track { width: 200px; height: 2px; background: var(--border-glass); border-radius: 1px; overflow: hidden; }
+    .loading-bar-fill { height: 100%; width: 0; background: var(--gradient-primary); border-radius: 1px; animation: loading-progress 1.8s ease forwards; }
+    @keyframes loading-progress { from { width: 0; } to { width: 100%; } }
+
+    /* ===== NAVBAR ===== */
+    #navbar {
+      position: fixed; top: 0; width: 100%; z-index: 1000;
+      background: rgba(10,10,10,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-glass); height: 70px;
+      transition: height 0.3s ease;
+    }
+    #navbar.scrolled { height: 60px; }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 100%; max-width: 1200px; margin: 0 auto; padding: 0 2rem; gap: 1.5rem;
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.1rem;
+      color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;
+    }
+    .nav-logo-dot { color: var(--primary); }
+    .nav-links { display: flex; align-items: center; gap: 1.75rem; list-style: none; }
+    .nav-links a {
+      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.9rem;
+      color: var(--text-body); letter-spacing: 0.03em; transition: color 0.2s; text-decoration: none; white-space: nowrap;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--primary); }
+    .nav-cta {
+      background: var(--gradient-primary); color: #0A0A0A !important; font-weight: 700;
+      font-size: 0.85rem; padding: 0.5rem 1.25rem; border-radius: 6px; border: none;
+      text-decoration: none; white-space: nowrap; transition: opacity 0.3s, transform 0.3s, box-shadow 0.3s;
+      display: inline-block;
+    }
+    .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(144,193,62,0.4); color: #0A0A0A !important; }
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; padding: 0.25rem; flex-shrink: 0;
+    }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--text-primary); border-radius: 2px; }
+    .mobile-menu { display: none; background: var(--bg-surface); padding: 0 2rem; border-bottom: 1px solid var(--border-glass); }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a {
+      display: block; padding: 0.7rem 0; font-size: 0.95rem; font-weight: 500;
+      color: var(--text-body); border-bottom: 1px solid var(--border-glass); transition: color 0.2s;
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { color: var(--primary); }
+
+    /* ===== SCROLL ANIMATIONS ===== */
+    .animate-on-scroll { opacity: 0; transform: translateY(32px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .animate-on-scroll.animated { opacity: 1; transform: translateY(0); }
+
+    /* ===== HERO ===== */
+    #hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding-top: 70px; position: relative; overflow: hidden;
+    }
+    #hero-canvas { position: absolute; inset: 0; z-index: 0; }
+    .hero-content {
+      position: relative; z-index: 1; max-width: 800px;
+      text-align: center; padding: 2rem 2rem 6rem;
+    }
+    .hero-content > * { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .hero-content.revealed > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0ms; }
+    .hero-content.revealed > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 150ms; }
+    .hero-content.revealed > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 300ms; }
+    .hero-content.revealed > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 450ms; }
+    .hero-content.revealed > *:nth-child(5) { opacity: 1; transform: none; transition-delay: 600ms; }
+    .hero-content.revealed > *:nth-child(6) { opacity: 1; transform: none; transition-delay: 800ms; }
+    .hero-content.revealed > *:nth-child(7) { opacity: 1; transform: none; transition-delay: 800ms; }
+
+    .availability-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(144,193,62,0.12); border: 1px solid rgba(144,193,62,0.35);
+      color: var(--primary); font-size: 0.78rem; font-weight: 600;
+      padding: 0.35rem 1rem; border-radius: 999px; letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .availability-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: dot-pulse 1.5s ease-in-out infinite; flex-shrink: 0; }
+    @keyframes dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero-h1 { font-size: clamp(2.8rem, 6vw, 5rem); font-weight: 700; line-height: 1.1; color: var(--text-primary); margin: 1rem 0 0.75rem; }
+    .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    .hero-sub { font-size: clamp(1rem, 2vw, 1.2rem); color: var(--text-body); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.7; }
+    .urgency { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 2rem; letter-spacing: 0.04em; }
+
+    .hero-ctas { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-block; background: var(--gradient-primary); color: #0A0A0A;
+      font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1rem;
+      padding: 0.85rem 2rem; border-radius: 8px; border: none; transition: all 0.3s; text-decoration: none;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(144,193,62,0.45); color: #0A0A0A; }
+    .btn-secondary {
+      display: inline-block; background: transparent; color: var(--text-primary);
+      font-family: 'Inter', sans-serif; font-weight: 600; font-size: 1rem;
+      padding: 0.85rem 2rem; border-radius: 8px; border: 1.5px solid var(--border-glass); transition: all 0.3s; text-decoration: none;
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-3px); }
+
+    .hero-stats {
+      display: flex; justify-content: center; align-items: center;
+      gap: 2.5rem; margin-top: 3rem; padding-top: 2rem;
+      border-top: 1px solid var(--border-glass); flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-number { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.6rem; color: var(--primary); display: block; }
+    .hero-stat-label { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 0.2rem; display: block; }
+    .stat-divider { width: 1px; height: 40px; background: var(--border-glass); }
+
+    .scroll-indicator {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem; z-index: 1;
+    }
+    .scroll-indicator span { font-size: 0.75rem; color: var(--text-muted); }
+    .scroll-chevron { color: var(--primary); font-size: 1.5rem; animation: bounce 1.5s ease infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+    /* ===== ABOUT ===== */
+    #about { background: var(--bg-surface); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+    .about-photo-col { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+
+    .photo-wrapper { position: relative; width: 320px; height: 320px; margin: 0 auto; }
+    .photo-circle {
+      border-radius: 50%; width: 320px; height: 320px; overflow: hidden;
+      border: 3px solid var(--primary); box-shadow: 0 0 40px rgba(144,193,62,0.2);
+      background: linear-gradient(135deg, #1a2a0a 0%, #0f1a0a 100%);
+      display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .photo-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-fallback {
+      position: absolute; inset: 0; display: none;
+      align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 3rem; color: var(--primary);
+    }
+    #orbit-canvas {
+      position: absolute; top: -40px; left: -40px;
+      width: calc(100% + 80px); height: calc(100% + 80px);
+      pointer-events: none; z-index: 2;
+    }
+
+    .about-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--text-primary); text-align: center; }
+    .about-title { font-size: 0.9rem; color: var(--primary); text-align: center; }
+    .about-location { font-size: 0.85rem; color: var(--text-muted); text-align: center; }
+    .btn-cv {
+      display: inline-block; background: transparent; color: var(--text-primary);
+      font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem;
+      padding: 0.6rem 1.5rem; border-radius: 8px; border: 1.5px solid var(--border-glass); transition: all 0.3s; text-decoration: none; margin-top: 0.5rem;
+    }
+    .btn-cv:hover { border-color: var(--primary); color: var(--primary); }
+
+    .about-bio-col h2 { font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 700; color: var(--text-primary); line-height: 1.2; margin-bottom: 1.25rem; }
+    .about-bio-col p { font-size: 1rem; color: var(--text-body); line-height: 1.75; margin-bottom: 1rem; }
+
+    .skill-bars { margin-top: 2rem; }
+    .skill-bars h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1rem; color: var(--text-primary); margin-bottom: 1rem; }
+    .skill-item { margin-bottom: 1rem; }
+    .skill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+    .skill-name { font-weight: 500; font-size: 0.9rem; color: var(--text-body); }
+    .skill-percent { font-weight: 600; font-size: 0.9rem; color: var(--primary); }
+    .skill-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .skill-fill { height: 100%; background: var(--gradient-primary); border-radius: 3px; width: 0; transition: width 1.2s ease; }
+
+    .about-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+    .about-stat-box { background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 12px; padding: 1.25rem 1rem; text-align: center; }
+    .about-stat-number { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 2rem; color: var(--primary); display: block; }
+    .about-stat-label { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 0.25rem; display: block; }
+
+    /* ===== PROJECTS ===== */
+    #projects { background: var(--bg-base); }
+    .projects-header { text-align: center; margin-bottom: 3rem; }
+    .projects-header h2 { font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+
+    .filter-tabs { display: flex; justify-content: center; align-items: center; gap: 0.75rem; margin-bottom: 3rem; flex-wrap: wrap; }
+    .filter-tab {
+      background: transparent; border: 1px solid var(--border-glass); color: var(--text-muted);
+      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.85rem;
+      padding: 0.45rem 1.1rem; border-radius: 999px; cursor: none; transition: all 0.25s;
+    }
+    .filter-tab:hover, .filter-tab.active { background: var(--primary); color: #0A0A0A; border-color: var(--primary); }
+
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem; }
+    .project-card {
+      background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 16px;
+      overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; display: flex; flex-direction: column;
+    }
+    .project-card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(144,193,62,0.15); }
+
+    .project-image-area { height: 220px; overflow: hidden; position: relative; }
+    .project-primary-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+    .project-card:hover .project-primary-img { transform: scale(1.05); }
+
+    .project-gallery-strip {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      display: flex; gap: 4px; padding: 4px; background: rgba(0,0,0,0.5); overflow-x: auto;
+    }
+    .gallery-thumb { width: 52px; height: 40px; object-fit: cover; border-radius: 4px; opacity: 0.75; transition: opacity 0.2s; flex-shrink: 0; }
+    .gallery-thumb:hover { opacity: 1; }
+
+    .category-chip {
+      position: absolute; top: 12px; left: 12px; z-index: 2;
+      background: rgba(144,193,62,0.12); border: 1px solid rgba(144,193,62,0.35);
+      color: var(--primary); font-size: 0.75rem; font-weight: 600;
+      padding: 0.3rem 0.8rem; border-radius: 999px; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .project-body { padding: 1.5rem; display: flex; flex-direction: column; flex: 1; }
+    .project-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.1rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .project-desc { font-size: 0.9rem; color: var(--text-body); line-height: 1.6; margin-bottom: 1rem; }
+    .project-metrics { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .metric-tag { background: rgba(144,193,62,0.08); border-radius: 6px; padding: 0.3rem 0.7rem; font-size: 0.8rem; color: var(--primary); font-weight: 600; }
+    .project-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+    .project-org { font-size: 0.78rem; color: var(--text-muted); }
+    .project-link { color: var(--primary); font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: text-decoration 0.2s; }
+    .project-link:hover { text-decoration: underline; color: var(--primary); }
+
+    /* ===== SERVICES ===== */
+    #services { background: var(--bg-surface); }
+    .services-header { text-align: center; margin-bottom: 3.5rem; }
+    .services-header h2 { font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 700; color: var(--text-primary); line-height: 1.2; margin-bottom: 1rem; }
+    .services-sub { font-size: 1.05rem; color: var(--text-body); max-width: 650px; margin: 0 auto; line-height: 1.7; text-align: center; }
+
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.75rem; }
+    .service-card {
+      background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 16px;
+      padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 1rem; transition: all 0.3s;
+    }
+    .service-card:hover { border-color: var(--primary); transform: translateY(-6px); box-shadow: 0 16px 48px rgba(144,193,62,0.12); }
+
+    .service-icon {
+      width: 48px; height: 48px; background: rgba(144,193,62,0.1); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .service-icon svg { width: 24px; height: 24px; fill: none; stroke: var(--primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .service-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--text-primary); }
+    .service-desc { font-size: 0.9rem; color: var(--text-body); line-height: 1.65; }
+    .service-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+    .service-list li { font-size: 0.85rem; color: var(--text-body); line-height: 1.8; display: flex; align-items: flex-start; gap: 0.5rem; }
+    .service-list li::before { content: '✓'; color: var(--primary); font-weight: 700; flex-shrink: 0; }
+    .service-cta {
+      display: block; background: transparent; border: 1.5px solid var(--border-glass);
+      color: var(--text-primary); font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem;
+      padding: 0.7rem 1.25rem; border-radius: 8px; text-align: center; transition: all 0.25s; text-decoration: none; margin-top: auto;
+    }
+    .service-cta:hover { background: var(--primary); color: #0A0A0A; border-color: var(--primary); }
+
+    /* ===== TESTIMONIALS ===== */
+    #testimonials { background: var(--bg-base); }
+    .testimonials-header { text-align: center; margin-bottom: 3rem; }
+    .testimonials-header h2 { font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.75rem; }
+    .testimonial-card {
+      background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 16px;
+      padding: 2rem; position: relative; overflow: hidden;
+    }
+    .testimonial-card::before {
+      content: '"'; font-size: 8rem; color: rgba(144,193,62,0.06);
+      position: absolute; top: -1rem; left: 1rem; font-family: Georgia, serif; line-height: 1; pointer-events: none;
+    }
+    .stars { color: #F59E0B; font-size: 1rem; letter-spacing: 0.1em; margin-bottom: 1rem; }
+    .testimonial-quote { font-size: 0.95rem; font-style: italic; color: var(--text-body); line-height: 1.8; margin-bottom: 1.5rem; }
+    .testimonial-footer { display: flex; align-items: center; gap: 0.75rem; }
+    .testimonial-avatar {
+      width: 40px; height: 40px; min-width: 40px;
+      background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      color: #0A0A0A; font-weight: 700; font-size: 0.9rem;
+    }
+    .testimonial-name { font-weight: 600; font-size: 0.95rem; color: var(--text-primary); }
+    .testimonial-role { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* ===== CONTACT ===== */
+    #contact { background: var(--bg-surface); }
+    .contact-header { text-align: center; margin-bottom: 3.5rem; }
+    .contact-header h2 { font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 700; color: var(--text-primary); line-height: 1.2; margin-bottom: 1rem; }
+    .contact-sub { font-size: 1.05rem; color: var(--text-body); max-width: 650px; margin: 0 auto; line-height: 1.7; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 4rem; }
+    .contact-info-col { display: flex; flex-direction: column; gap: 2rem; }
+    .contact-item { display: flex; align-items: flex-start; gap: 1rem; }
+    .contact-icon {
+      width: 40px; height: 40px; min-width: 40px;
+      background: rgba(144,193,62,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .contact-icon svg { width: 18px; height: 18px; fill: none; stroke: var(--primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .contact-item-label { font-weight: 500; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.15rem; }
+    .contact-item-value { font-weight: 500; font-size: 0.95rem; color: var(--text-primary); }
+    .contact-item-value a { color: var(--text-primary); text-decoration: none; transition: color 0.2s; }
+    .contact-item-value a:hover { color: var(--primary); }
+
+    .social-links { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .social-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      color: var(--text-primary); padding: 0.65rem 1.25rem; border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem; transition: all 0.25s; text-decoration: none;
+    }
+    .social-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .social-btn.linkedin:hover { border-color: #0A66C2; color: #0A66C2; }
+    .social-btn.github:hover { border-color: var(--primary); color: var(--primary); }
+
+    #contact-form { display: flex; flex-direction: column; gap: 1.25rem; }
+    .form-row { display: flex; gap: 1rem; }
+    .form-row > div { flex: 1; }
+    #contact-form input,
+    #contact-form select,
+    #contact-form textarea {
+      background: var(--bg-glass); border: 1.5px solid var(--border-glass); border-radius: 10px;
+      color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem;
+      padding: 0.85rem 1rem; width: 100%; outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    #contact-form select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B6B6B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 1rem center; background-color: var(--bg-glass);
+    }
+    #contact-form input:focus, #contact-form select:focus, #contact-form textarea:focus { border-color: var(--primary); }
+    #contact-form input.error, #contact-form select.error, #contact-form textarea.error { border-color: #ef4444; }
+    #contact-form input::placeholder, #contact-form textarea::placeholder { color: var(--text-muted); }
+    #contact-form select option { background: var(--bg-surface); color: var(--text-primary); }
+    .error-msg { font-size: 0.8rem; color: #ef4444; display: block; margin-top: 0.25rem; }
+    .btn-submit {
+      width: 100%; background: var(--gradient-primary); color: #0A0A0A;
+      font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1rem;
+      padding: 0.85rem 2rem; border-radius: 8px; border: none; transition: all 0.3s;
+    }
+    .btn-submit:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(144,193,62,0.45); }
+    .btn-submit:disabled { opacity: 0.7; }
+    .form-success { color: var(--primary); font-size: 0.95rem; text-align: center; margin-top: 0.5rem; }
+
+    /* ===== FOOTER ===== */
+    footer { background: #060606; border-top: 1px solid var(--border-glass); padding: 3.5rem 0 2rem; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .footer-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.35rem; }
+    .footer-tagline { font-size: 0.88rem; color: var(--text-muted); margin-top: 0.5rem; max-width: 240px; line-height: 1.5; }
+    .footer-col-label { font-weight: 600; font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; display: block; }
+    .footer-nav-links a { display: block; font-size: 0.9rem; color: var(--text-body); margin-bottom: 0.5rem; text-decoration: none; transition: color 0.2s; }
+    .footer-nav-links a:hover { color: var(--primary); }
+    .footer-contact-col { display: flex; flex-direction: column; gap: 0.5rem; }
+    .footer-contact-col a, .footer-contact-col span { font-size: 0.88rem; color: var(--text-body); text-decoration: none; transition: color 0.2s; }
+    .footer-contact-col a:hover { color: var(--primary); }
+    .footer-social { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .footer-social-icon {
+      width: 32px; height: 32px; background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); transition: all 0.25s; text-decoration: none;
+    }
+    .footer-social-icon svg { width: 14px; height: 14px; }
+    .footer-social-icon:hover { border-color: var(--primary); color: var(--primary); }
+    .footer-divider { border-top: 1px solid var(--border-glass); margin: 0 0 1.5rem; }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .footer-copy, .footer-spec { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 991px) {
+      section { padding: 80px 0; }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .testimonials-grid { grid-template-columns: 1fr 1fr; }
+      .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .nav-links, .nav-cta-desktop { display: none !important; }
+      .hamburger { display: flex; }
+    }
+    @media (max-width: 767px) {
+      section { padding: 60px 0; }
+      .hero-h1 { font-size: 2.4rem !important; }
+      .stat-divider { display: none; }
+      .projects-grid, .services-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .footer-top { flex-direction: column; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .btn-cv { width: 100%; text-align: center; }
+    }
+    @media (max-width: 599px) {
+      .form-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-outer" id="cursor-outer"></div>
+  <div class="cursor-inner" id="cursor-inner"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay">
+    <div class="loading-monogram">TL</div>
+    <div class="loading-bar-track">
+      <div class="loading-bar-fill"></div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-logo">
+        <span class="nav-logo-dot">●</span>TIEHO LARA
+      </a>
+      <ul class="nav-links" id="nav-links-list">
+        <li><a href="#hero" class="nav-link">Home</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#services" class="nav-link">Services</a></li>
+        <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <a href="#contact" class="nav-cta nav-cta-desktop">Hire Me</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#hero">Home</a>
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#services">Services</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO ==================== -->
+  <section id="hero">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-content">
+      <div class="availability-badge"><span class="availability-dot"></span>Available for Projects</div>
+      <h1 class="hero-h1">Turning <span class="gradient-text">Spatial Data</span><br>Into Decisions That Save Lives</h1>
+      <p class="hero-sub">GIS Consultant &amp; Geomatics Professional specialising in health catchment analysis, digital microplanning, UAV photogrammetry, and geospatial standards for ministries, donors, and humanitarian organisations across Southern Africa.</p>
+      <p class="urgency">⚡ Only 2 consulting slots available this quarter — currently accepting new projects</p>
+      <div class="hero-ctas">
+        <a href="#projects" class="btn-primary">View My Work</a>
+        <a href="#contact" class="btn-secondary">Get in Touch</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-number">8+</span>
+          <span class="hero-stat-label">Years Experience</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-number">15+</span>
+          <span class="hero-stat-label">Projects Delivered</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-number">6</span>
+          <span class="hero-stat-label">Organisations Served</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator" id="scroll-down">
+      <span>Scroll</span>
+      <div class="scroll-chevron">&#8964;</div>
+    </div>
+  </section>
+
+  <!-- ==================== ABOUT ==================== -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <!-- Left: Photo -->
+        <div class="about-photo-col animate-on-scroll">
+          <div class="photo-wrapper">
+            <div class="photo-circle">
+              <img src="headshot.jpeg" alt="Tieho Lara" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+              <div class="photo-fallback">TL</div>
+            </div>
+            <canvas id="orbit-canvas"></canvas>
+          </div>
+          <div class="about-name">Tieho Lara</div>
+          <div class="about-title">GIS Consultant &amp; Geomatics Professional</div>
+          <div class="about-location">📍 Maseru, Lesotho</div>
+          <a href="Tieho Lara 2026 CV.pdf" download class="btn-cv">⬇ Download CV</a>
+        </div>
+        <!-- Right: Bio -->
+        <div class="about-bio-col">
+          <span class="section-label animate-on-scroll">ABOUT ME</span>
+          <h2 class="animate-on-scroll">Bridging the Gap Between Field Reality and Data-Driven Policy</h2>
+          <p class="animate-on-scroll">I'm a Geomatics professional with eight-plus years of progressive experience integrating classical land surveying with modern GIS, remote sensing, and spatial analytics. My applied focus spans public health systems, humanitarian response, disaster risk reduction, and infrastructure planning — working with ministries, donor organisations, and humanitarian partners to turn complex spatial data into decisions that matter.</p>
+          <p class="animate-on-scroll">Currently consulting with GDI Advisors on national health catchment delineation and digital microplanning for Lesotho's Ministry of Health, and previously with GIZ on national NSDI and geospatial standards assessment. I hold a BEng from the University of Cape Town and a Postgraduate Diploma in MEAL from the Humanitarian Global Institute.</p>
+
+          <div class="skill-bars animate-on-scroll" id="skill-bars">
+            <h4>Core Competencies</h4>
+            <div class="skill-item">
+              <div class="skill-header"><span class="skill-name">GIS &amp; Spatial Analysis</span><span class="skill-percent">95%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-width="95"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-header"><span class="skill-name">Health GIS &amp; EPI Microplanning</span><span class="skill-percent">92%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-width="92"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-header"><span class="skill-name">UAV / Aerial Photogrammetry</span><span class="skill-percent">85%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-width="85"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-header"><span class="skill-name">WebGIS &amp; Dashboard Development</span><span class="skill-percent">80%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-width="80"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-header"><span class="skill-name">M&amp;E &amp; Data Visualisation</span><span class="skill-percent">88%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-width="88"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-header"><span class="skill-name">Geospatial Standards (ISO/OGC)</span><span class="skill-percent">82%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-width="82"></div></div>
+            </div>
+          </div>
+
+          <div class="about-stats-grid animate-on-scroll">
+            <div class="about-stat-box"><span class="about-stat-number" data-target="8" data-suffix="+">0+</span><span class="about-stat-label">Years Experience</span></div>
+            <div class="about-stat-box"><span class="about-stat-number" data-target="15" data-suffix="+">0+</span><span class="about-stat-label">Projects Completed</span></div>
+            <div class="about-stat-box"><span class="about-stat-number" data-target="6" data-suffix="">0</span><span class="about-stat-label">Organisations</span></div>
+            <div class="about-stat-box"><span class="about-stat-number" data-target="3" data-suffix="">0</span><span class="about-stat-label">Countries</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PROJECTS ==================== -->
+  <section id="projects">
+    <div class="container">
+      <div class="projects-header">
+        <span class="section-label animate-on-scroll">SELECTED WORK</span>
+        <h2 class="animate-on-scroll">Projects That Created Real-World Impact</h2>
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="health-gis">Health GIS</button>
+        <button class="filter-tab" data-filter="standards-nsdi">Standards &amp; NSDI</button>
+        <button class="filter-tab" data-filter="webgis">WebGIS</button>
+        <button class="filter-tab" data-filter="humanitarian">Humanitarian</button>
+      </div>
+      <div class="projects-grid">
+
+        <!-- Card 1 -->
+        <div class="project-card animate-on-scroll" data-category="health-gis" style="transition-delay:0ms">
+          <div class="project-image-area">
+            <img class="project-primary-img" src="Photos/GIS Consultant/MoH_1.jpeg" alt="Lesotho GIS Health Catchments Map" loading="lazy" />
+            <div class="project-gallery-strip">
+              <img class="gallery-thumb" src="Photos/GIS Consultant/MoH_2.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/GIS Consultant/MoH_3.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/GIS Consultant/MoH_5.jpeg" alt="Gallery" loading="lazy" />
+            </div>
+            <span class="category-chip">Health GIS</span>
+          </div>
+          <div class="project-body">
+            <h3 class="project-title">Lesotho GIS Health Catchments Map</h3>
+            <p class="project-desc">Interactive WebGIS prototype visualising health facility catchment areas and village-to-facility assignments across all 10 districts of Lesotho, built for the Ministry of Health EPI programme with Gavi funding support.</p>
+            <div class="project-metrics">
+              <span class="metric-tag">178 Villages Remapped</span>
+              <span class="metric-tag">47% Distance Reduction</span>
+              <span class="metric-tag">10 Districts</span>
+            </div>
+            <div class="project-footer">
+              <span class="project-org">GDI Advisors / MoH Lesotho</span>
+              <a href="https://laratieho.github.io/Lesotho-GIS-Health-Catchments-Map" target="_blank" rel="noopener" class="project-link">View Project →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="project-card animate-on-scroll" data-category="health-gis" style="transition-delay:100ms">
+          <div class="project-image-area">
+            <img class="project-primary-img" src="Photos/GIS Consultant/MoH_D1.jpeg" alt="GIS Catchments Mapping Donor Final Report" loading="lazy" />
+            <div class="project-gallery-strip">
+              <img class="gallery-thumb" src="Photos/GIS Consultant/MoH_D2.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/GIS Consultant/MoH_D3.jpeg" alt="Gallery" loading="lazy" />
+            </div>
+            <span class="category-chip">Health GIS</span>
+          </div>
+          <div class="project-body">
+            <h3 class="project-title">GIS Catchments Mapping — Donor Final Report</h3>
+            <p class="project-desc">Comprehensive 73-page donor-level closeout report for the Lesotho GIS health catchments mapping initiative, covering spatial methodology, district synthesis, village reassignment analysis, capacity building, and alignment with WHO/UNICEF/Gavi blueprint.</p>
+            <div class="project-metrics">
+              <span class="metric-tag">73-Page Report</span>
+              <span class="metric-tag">6,225 Villages</span>
+              <span class="metric-tag">145 Facilities</span>
+            </div>
+            <div class="project-footer">
+              <span class="project-org">GDI Advisors / Gavi</span>
+              <a href="#projects" class="project-link">View Project →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="project-card animate-on-scroll" data-category="standards-nsdi" style="transition-delay:200ms">
+          <div class="project-image-area">
+            <img class="project-primary-img" src="Photos/Geomatics Technical Consultant/MoLC_1.jpeg" alt="National NSDI and Geospatial Standards Assessment" loading="lazy" />
+            <div class="project-gallery-strip">
+              <img class="gallery-thumb" src="Photos/Geomatics Technical Consultant/MoLC_2.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/Geomatics Technical Consultant/MoLC_3.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/Geomatics Technical Consultant/MoLC_4.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/Geomatics Technical Consultant/MoLC_5.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/Geomatics Technical Consultant/MoLC_6.jpeg" alt="Gallery" loading="lazy" />
+            </div>
+            <span class="category-chip">Standards &amp; NSDI</span>
+          </div>
+          <div class="project-body">
+            <h3 class="project-title">National NSDI &amp; Geospatial Standards Assessment</h3>
+            <p class="project-desc">Technical consultancy for GIZ on behalf of the Ministry of Local Government, assessing Lesotho's National Spatial Data Infrastructure against ISO, OGC, ICAO, and AFREF standards, covering data governance, UAV policy, and CRS practice.</p>
+            <div class="project-metrics">
+              <span class="metric-tag">ISO/OGC/ICAO Aligned</span>
+              <span class="metric-tag">National Scope</span>
+              <span class="metric-tag">Policy Recommendations</span>
+            </div>
+            <div class="project-footer">
+              <span class="project-org">GIZ / Ministry of Local Government</span>
+              <a href="#projects" class="project-link">View Project →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="project-card animate-on-scroll" data-category="humanitarian" style="transition-delay:300ms">
+          <div class="project-image-area">
+            <img class="project-primary-img" src="Photos/Geomatics Engineering/GC_01.jpeg" alt="UAV Drone Mapping for Disaster Risk Reduction" loading="lazy" />
+            <div class="project-gallery-strip">
+              <img class="gallery-thumb" src="Photos/Geomatics Engineering/GC_2.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/Geomatics Engineering/GC_3.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/Geomatics Engineering/GC_4.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/Geomatics Engineering/GC_5.jpeg" alt="Gallery" loading="lazy" />
+            </div>
+            <span class="category-chip">Humanitarian</span>
+          </div>
+          <div class="project-body">
+            <h3 class="project-title">UAV Drone Mapping for Disaster Risk Reduction</h3>
+            <p class="project-desc">High-resolution UAV aerial surveys and photogrammetric processing for community DRR planning and resilience programming across vulnerable communities, producing ortho-rectified imagery and digital terrain models.</p>
+            <div class="project-metrics">
+              <span class="metric-tag">High-Res Orthophotos</span>
+              <span class="metric-tag">DEM Generated</span>
+              <span class="metric-tag">DRR Planning</span>
+            </div>
+            <div class="project-footer">
+              <span class="project-org">World Vision Lesotho</span>
+              <a href="#projects" class="project-link">View Project →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="project-card animate-on-scroll" data-category="health-gis" style="transition-delay:400ms">
+          <div class="project-image-area">
+            <img class="project-primary-img" src="Photos/GIS Consultant/MoH_T1.jpeg" alt="EPI Coverage and Equity Analysis Dashboards" loading="lazy" />
+            <div class="project-gallery-strip">
+              <img class="gallery-thumb" src="Photos/GIS Consultant/MoH_T2.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/GIS Consultant/MoH_T3.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/GIS Consultant/MoH_T4.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="Photos/GIS Consultant/MoL_3.jpeg" alt="Gallery" loading="lazy" />
+            </div>
+            <span class="category-chip">Health GIS</span>
+          </div>
+          <div class="project-body">
+            <h3 class="project-title">EPI Coverage &amp; Equity Analysis Dashboards</h3>
+            <p class="project-desc">Spatial intelligence tools and interactive dashboards for the Ministry of Health Expanded Programme on Immunisation, enabling district-level equity analysis, dropout tracking, and coverage monitoring integrated with DHIS2.</p>
+            <div class="project-metrics">
+              <span class="metric-tag">DHIS2 Integrated</span>
+              <span class="metric-tag">District-Level Equity</span>
+              <span class="metric-tag">Coverage Analysis</span>
+            </div>
+            <div class="project-footer">
+              <span class="project-org">CHAI / Ministry of Health</span>
+              <a href="#projects" class="project-link">View Project →</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SERVICES ==================== -->
+  <section id="services">
+    <div class="container">
+      <div class="services-header">
+        <span class="section-label animate-on-scroll">WHAT I DO</span>
+        <h2 class="animate-on-scroll">Specialist GIS &amp; Geomatics Services</h2>
+        <p class="services-sub animate-on-scroll">From field survey to decision-support dashboard — end-to-end spatial consulting for health systems, governments, and humanitarian organisations.</p>
+      </div>
+      <div class="services-grid">
+
+        <!-- Service 1 -->
+        <div class="service-card animate-on-scroll" style="transition-delay:0ms">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+          </div>
+          <div class="service-name">GIS Consulting &amp; Spatial Analysis</div>
+          <p class="service-desc">End-to-end GIS project management and spatial analysis — from data acquisition and cleaning through to analysis, mapping, and decision-support outputs for government and donor clients.</p>
+          <ul class="service-list">
+            <li>Spatial database design and management</li>
+            <li>Feature extraction and topology validation</li>
+            <li>Multi-criteria spatial analysis</li>
+            <li>Cartographic output and map production</li>
+          </ul>
+          <a href="#contact" class="service-cta">Get a Quote →</a>
+        </div>
+
+        <!-- Service 2 -->
+        <div class="service-card animate-on-scroll" style="transition-delay:100ms">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <div class="service-name">Health GIS &amp; EPI Microplanning</div>
+          <p class="service-desc">Geospatial intelligence tools for health systems strengthening — health facility catchment delineation, Master Facility List validation, and WHO RED-aligned digital microplans for immunisation programme delivery.</p>
+          <ul class="service-list">
+            <li>Catchment boundary delineation</li>
+            <li>MFL data validation and cleaning</li>
+            <li>Digital microplan development</li>
+            <li>DHIS2-compatible spatial outputs</li>
+          </ul>
+          <a href="#contact" class="service-cta">Get a Quote →</a>
+        </div>
+
+        <!-- Service 3 -->
+        <div class="service-card animate-on-scroll" style="transition-delay:200ms">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="service-name">UAV Survey &amp; Photogrammetry</div>
+          <p class="service-desc">Full-service UAV aerial survey workflow from flight planning and regulatory compliance through GCP collection, photogrammetric processing, and delivery of orthorectified imagery and digital elevation models.</p>
+          <ul class="service-list">
+            <li>Flight planning and safety assessment</li>
+            <li>GCP survey and ground control</li>
+            <li>Orthophoto and DEM production</li>
+            <li>Accuracy reporting to ICAO/ISO standards</li>
+          </ul>
+          <a href="#contact" class="service-cta">Get a Quote →</a>
+        </div>
+
+        <!-- Service 4 -->
+        <div class="service-card animate-on-scroll" style="transition-delay:0ms">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="service-name">NSDI &amp; Geospatial Standards</div>
+          <p class="service-desc">Technical consultancy on national geospatial data infrastructure — assessing and aligning data standards, CRS practices, metadata frameworks, and UAV governance against ISO 19100-series, OGC, AFREF, and ICAO requirements.</p>
+          <ul class="service-list">
+            <li>NSDI readiness assessment</li>
+            <li>ISO/OGC standards alignment</li>
+            <li>UAV regulatory framework review</li>
+            <li>Donor-ready standards reporting</li>
+          </ul>
+          <a href="#contact" class="service-cta">Get a Quote →</a>
+        </div>
+
+        <!-- Service 5 -->
+        <div class="service-card animate-on-scroll" style="transition-delay:100ms">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div class="service-name">WebGIS &amp; Dashboard Development</div>
+          <p class="service-desc">Interactive map applications and operational dashboards for district teams and decision-makers — from Leaflet-based WebGIS prototypes to Power BI and ArcGIS Experience Builder deployments.</p>
+          <ul class="service-list">
+            <li>WebGIS prototype development</li>
+            <li>Interactive thematic mapping</li>
+            <li>Indicator dashboards</li>
+            <li>MoH/HMIS system integration guidance</li>
+          </ul>
+          <a href="#contact" class="service-cta">Get a Quote →</a>
+        </div>
+
+        <!-- Service 6 -->
+        <div class="service-card animate-on-scroll" style="transition-delay:200ms">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><polyline points="2 20 22 20"/></svg>
+          </div>
+          <div class="service-name">M&amp;E, Data Visualisation &amp; Reporting</div>
+          <p class="service-desc">Results-focused monitoring, evaluation, accountability and learning frameworks with data visualisation and donor-standard reporting for immunisation, humanitarian, and development programmes.</p>
+          <ul class="service-list">
+            <li>M&amp;E framework design</li>
+            <li>Coverage and equity analysis</li>
+            <li>Donor logframe reporting</li>
+            <li>Harvard-referenced technical report writing</li>
+          </ul>
+          <a href="#contact" class="service-cta">Get a Quote →</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TESTIMONIALS ==================== -->
+  <section id="testimonials">
+    <div class="container">
+      <div class="testimonials-header">
+        <span class="section-label animate-on-scroll">CLIENT FEEDBACK</span>
+        <h2 class="animate-on-scroll">What Clients Say</h2>
+      </div>
+      <div class="testimonials-grid">
+
+        <div class="testimonial-card animate-on-scroll" style="transition-delay:0ms">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-quote">"Tieho's work on the GIS health catchment mapping initiative was exceptional. His ability to translate complex spatial analysis into clear, actionable outputs for district health teams — and to communicate methodology to senior ministry and donor stakeholders simultaneously — set a new benchmark for GIS delivery in Lesotho."</p>
+          <div class="testimonial-footer">
+            <div class="testimonial-avatar">TM</div>
+            <div>
+              <div class="testimonial-name">Ts'episo Mechele</div>
+              <div class="testimonial-role">EPI Programme Manager, Ministry of Health</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card animate-on-scroll" style="transition-delay:100ms">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-quote">"The NSDI standards assessment delivered by Tieho for GIZ was rigorous, well-documented, and directly actionable. He brought both technical depth and strong report-writing discipline — the deliverables met donor requirements out of the box."</p>
+          <div class="testimonial-footer">
+            <div class="testimonial-avatar">PR</div>
+            <div>
+              <div class="testimonial-name">Pheello Ramotubei</div>
+              <div class="testimonial-role">Chief Surveyor, Land Survey and Physical Planning, Ministry of Local Government and Chieftainship</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card animate-on-scroll" style="transition-delay:200ms">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-quote">"Tieho produced spatial intelligence tools and dashboards that genuinely improved how our district teams understood immunisation coverage. His understanding of both the GIS pipeline and the public health programme context made him an outstanding technical partner."</p>
+          <div class="testimonial-footer">
+            <div class="testimonial-avatar">TM</div>
+            <div>
+              <div class="testimonial-name">Tholaoana Masupha</div>
+              <div class="testimonial-role">Immunization Manager, CHAI Lesotho (Until 2024)</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONTACT ==================== -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-header">
+        <span class="section-label animate-on-scroll">GET IN TOUCH</span>
+        <h2 class="animate-on-scroll">Let's Work Together</h2>
+        <p class="contact-sub animate-on-scroll">Available for GIS consulting, geospatial standards work, health system spatial analysis, and UAV survey projects. Currently accepting new engagements for Q3 2026.</p>
+      </div>
+      <div class="contact-grid">
+
+        <!-- Left: Contact info -->
+        <div class="contact-info-col">
+          <div class="contact-item animate-on-scroll">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <div class="contact-item-label">Email</div>
+              <div class="contact-item-value"><a href="mailto:ernesttieo@gmail.com">ernesttieo@gmail.com</a></div>
+            </div>
+          </div>
+          <div class="contact-item animate-on-scroll">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div class="contact-item-label">Based in</div>
+              <div class="contact-item-value">Maseru District, Lesotho</div>
+            </div>
+          </div>
+          <div class="contact-item animate-on-scroll">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <div class="contact-item-label">Time Zone</div>
+              <div class="contact-item-value">SAST — UTC+02:00</div>
+            </div>
+          </div>
+          <div class="contact-item animate-on-scroll">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.58 1.24h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>
+            </div>
+            <div>
+              <div class="contact-item-label">Response Time</div>
+              <div class="contact-item-value">Within 24 hours</div>
+            </div>
+          </div>
+
+          <div class="social-links">
+            <a href="https://linkedin.com/in/tieholara" target="_blank" rel="noopener" class="social-btn linkedin">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              LinkedIn
+            </a>
+            <a href="https://github.com/laratieho" target="_blank" rel="noopener" class="social-btn github">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Form -->
+        <div class="animate-on-scroll">
+          <form id="contact-form" novalidate>
+            <div class="form-row">
+              <div><input type="text" name="name" placeholder="Full Name" required /></div>
+              <div><input type="email" name="email" placeholder="Email Address" required /></div>
+            </div>
+            <div><input type="text" name="organisation" placeholder="Organisation (optional)" /></div>
+            <div>
+              <select name="service" required>
+                <option value="">Select a Service</option>
+                <option value="gis">GIS Consulting &amp; Spatial Analysis</option>
+                <option value="health-gis">Health GIS &amp; EPI Microplanning</option>
+                <option value="uav">UAV Survey &amp; Photogrammetry</option>
+                <option value="nsdi">NSDI &amp; Geospatial Standards</option>
+                <option value="webgis">WebGIS &amp; Dashboard Development</option>
+                <option value="me">M&amp;E &amp; Data Visualisation</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div><textarea name="message" rows="5" placeholder="Tell me about your project..." required></textarea></div>
+            <button type="submit" class="btn-submit">Send Message →</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <div class="footer-logo"><span style="color:var(--primary)">●</span>&nbsp;TIEHO LARA</div>
+          <p class="footer-tagline">Turning Spatial Data Into Decisions That Save Lives</p>
+        </div>
+        <div>
+          <span class="footer-col-label">NAVIGATION</span>
+          <div class="footer-nav-links">
+            <a href="#hero">Home</a>
+            <a href="#about">About</a>
+            <a href="#projects">Projects</a>
+            <a href="#services">Services</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
+        <div>
+          <span class="footer-col-label">CONTACT</span>
+          <div class="footer-contact-col">
+            <a href="mailto:ernesttieo@gmail.com">ernesttieo@gmail.com</a>
+            <span>Maseru, Lesotho</span>
+            <span>SAST — UTC+02:00</span>
+          </div>
+          <div class="footer-social">
+            <a href="https://linkedin.com/in/tieholara" target="_blank" rel="noopener" class="footer-social-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+            <a href="https://github.com/laratieho" target="_blank" rel="noopener" class="footer-social-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <span class="footer-copy">© 2026 Tieho Lara. All rights reserved.</span>
+        <span class="footer-spec">Geomatics · GIS · Spatial Analytics</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Three.js loaded synchronously before inline scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+  /* ====================================================
+     CUSTOM CURSOR
+  ==================================================== */
+  (function () {
+    var outer = document.getElementById('cursor-outer');
+    var inner = document.getElementById('cursor-inner');
+    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    var ox = mx, oy = my;
+
+    document.addEventListener('mousemove', function (e) {
+      mx = e.clientX; my = e.clientY;
+      inner.style.left = mx + 'px';
+      inner.style.top  = my + 'px';
+    });
+
+    (function lerp() {
+      ox += (mx - ox) * 0.12;
+      oy += (my - oy) * 0.12;
+      outer.style.left = ox + 'px';
+      outer.style.top  = oy + 'px';
+      requestAnimationFrame(lerp);
+    })();
+
+    document.querySelectorAll('a, button, .cursor-hover').forEach(function (el) {
+      el.addEventListener('mouseenter', function () { outer.classList.add('hovered'); });
+      el.addEventListener('mouseleave', function () { outer.classList.remove('hovered'); });
+    });
+  })();
+
+  /* ====================================================
+     LOADING OVERLAY
+  ==================================================== */
+  (function () {
+    document.body.style.overflow = 'hidden';
+    var overlay = document.getElementById('loading-overlay');
+    setTimeout(function () {
+      overlay.style.opacity = '0';
+      document.body.style.overflow = '';
+      setTimeout(function () {
+        overlay.remove();
+        var hc = document.querySelector('.hero-content');
+        if (hc) hc.classList.add('revealed');
+      }, 500);
+    }, 2000);
+  })();
+
+  /* ====================================================
+     NAVBAR — scroll + hamburger + active link
+  ==================================================== */
+  (function () {
+    var navbar  = document.getElementById('navbar');
+    var burger  = document.getElementById('hamburger');
+    var mobile  = document.getElementById('mobile-menu');
+    var links   = document.querySelectorAll('.nav-link');
+    var sections = document.querySelectorAll('section[id]');
+
+    window.addEventListener('scroll', function () {
+      navbar.classList.toggle('scrolled', window.scrollY > 100);
+    });
+
+    burger.addEventListener('click', function () {
+      mobile.classList.toggle('open');
+    });
+
+    mobile.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () { mobile.classList.remove('open'); });
+    });
+
+    var secObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          links.forEach(function (l) {
+            l.classList.toggle('active', l.getAttribute('href') === '#' + entry.target.id);
+          });
+        }
+      });
+    }, { threshold: 0.4 });
+    sections.forEach(function (s) { secObs.observe(s); });
+  })();
+
+  /* ====================================================
+     SCROLL-DOWN INDICATOR
+  ==================================================== */
+  document.getElementById('scroll-down').addEventListener('click', function () {
+    document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  /* ====================================================
+     SCROLL ANIMATIONS
+  ==================================================== */
+  (function () {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animated');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.animate-on-scroll').forEach(function (el) { obs.observe(el); });
+  })();
+
+  /* ====================================================
+     SKILL BARS
+  ==================================================== */
+  (function () {
+    var sb = document.getElementById('skill-bars');
+    if (!sb) return;
+    var triggered = false;
+    var obs = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting && !triggered) {
+        triggered = true;
+        sb.querySelectorAll('.skill-fill').forEach(function (fill, i) {
+          setTimeout(function () {
+            fill.style.width = fill.getAttribute('data-width') + '%';
+          }, i * 100);
+        });
+        obs.disconnect();
+      }
+    }, { threshold: 0.3 });
+    obs.observe(sb);
+  })();
+
+  /* ====================================================
+     COUNTER ANIMATIONS
+  ==================================================== */
+  (function () {
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+    function animateNum(el) {
+      var target = parseInt(el.getAttribute('data-target'), 10);
+      var suffix = el.getAttribute('data-suffix') || '';
+      var start  = performance.now();
+      var dur    = 1500;
+      (function tick(now) {
+        var p = Math.min((now - start) / dur, 1);
+        el.textContent = Math.round(easeOut(p) * target) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      })(start);
+    }
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          animateNum(entry.target);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.about-stat-number[data-target]').forEach(function (el) { obs.observe(el); });
+  })();
+
+  /* ====================================================
+     PROJECT FILTER TABS + GALLERY SWAP
+  ==================================================== */
+  (function () {
+    var tabs  = document.querySelectorAll('.filter-tab');
+    var cards = document.querySelectorAll('.project-card');
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        var filter = tab.getAttribute('data-filter');
+        cards.forEach(function (card) {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = 'flex';
+            card.style.opacity = '0';
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () {
+                card.style.transition = 'opacity 0.3s ease, transform 0.3s, box-shadow 0.3s';
+                card.style.opacity = '1';
+              });
+            });
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    document.querySelectorAll('.project-card').forEach(function (card) {
+      var primary = card.querySelector('.project-primary-img');
+      card.querySelectorAll('.gallery-thumb').forEach(function (thumb) {
+        thumb.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var tmp = primary.src;
+          primary.src = thumb.src;
+          thumb.src = tmp;
+        });
+      });
+    });
+  })();
+
+  /* ====================================================
+     CONTACT FORM
+  ==================================================== */
+  (function () {
+    var form = document.getElementById('contact-form');
+    if (!form) return;
+
+    function clearErr(el) {
+      el.classList.remove('error');
+      var e = el.parentElement.querySelector('.error-msg');
+      if (e) e.remove();
+    }
+    function showErr(el, msg) {
+      el.classList.add('error');
+      if (!el.parentElement.querySelector('.error-msg')) {
+        var span = document.createElement('span');
+        span.className = 'error-msg';
+        span.textContent = msg;
+        el.insertAdjacentElement('afterend', span);
+      }
+    }
+
+    form.querySelectorAll('input, select, textarea').forEach(function (f) {
+      f.addEventListener('focus', function () { clearErr(f); });
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name    = form.querySelector('[name="name"]');
+      var email   = form.querySelector('[name="email"]');
+      var service = form.querySelector('[name="service"]');
+      var message = form.querySelector('[name="message"]');
+      var valid   = true;
+
+      [name, email, service, message].forEach(clearErr);
+
+      if (!name.value.trim())    { showErr(name,    'Please enter your name.');          valid = false; }
+      if (!email.value.trim())   { showErr(email,   'Please enter your email.');         valid = false; }
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                                   showErr(email,   'Please enter a valid email.');      valid = false; }
+      if (!service.value)        { showErr(service, 'Please select a service.');         valid = false; }
+      if (!message.value.trim()) { showErr(message, 'Please describe your project.');   valid = false; }
+      if (!valid) return;
+
+      var btn = form.querySelector('.btn-submit');
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+
+      var existingMsg = form.parentElement.querySelector('.form-success, .form-error');
+      if (existingMsg) existingMsg.remove();
+
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: '3c192c68-0d14-4496-b8fe-acefc2b25d74',
+          subject: 'New Portfolio Enquiry from ' + name.value.trim(),
+          from_name: name.value.trim(),
+          name: name.value.trim(),
+          email: email.value.trim(),
+          service: service.value,
+          message: message.value.trim(),
+          botcheck: ''
+        })
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        var msg = document.createElement('p');
+        if (data.success) {
+          msg.className = 'form-success';
+          msg.textContent = '✓ Message sent! I\'ll be in touch within 24 hours.';
+          form.reset();
+        } else {
+          msg.className = 'form-error';
+          msg.style.cssText = 'color:#ef4444;font-size:0.95rem;text-align:center;margin-top:0.5rem;';
+          msg.textContent = '✗ Something went wrong. Please email me directly at ernesttieo@gmail.com';
+        }
+        form.insertAdjacentElement('afterend', msg);
+        btn.textContent = 'Send Message →';
+        btn.disabled = false;
+      })
+      .catch(function () {
+        var msg = document.createElement('p');
+        msg.className = 'form-error';
+        msg.style.cssText = 'color:#ef4444;font-size:0.95rem;text-align:center;margin-top:0.5rem;';
+        msg.textContent = '✗ Network error. Please email me directly at ernesttieo@gmail.com';
+        form.insertAdjacentElement('afterend', msg);
+        btn.textContent = 'Send Message →';
+        btn.disabled = false;
+      });
+    });
+  })();
+
+  /* ====================================================
+     THREE.JS — HERO PARTICLE FIELD
+  ==================================================== */
+  (function () {
+    if (typeof THREE === 'undefined') return;
+    try {
+      var canvas   = document.getElementById('hero-canvas');
+      var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      var scene  = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.z = 5;
+
+      var isMobile = window.innerWidth < 768;
+      var count    = isMobile ? 600 : 1200;
+      var pos      = new Float32Array(count * 3);
+
+      for (var i = 0; i < count; i++) {
+        var r     = 8 * Math.cbrt(Math.random());
+        var theta = Math.acos(2 * Math.random() - 1);
+        var phi   = 2 * Math.PI * Math.random();
+        pos[i*3]   = r * Math.sin(theta) * Math.cos(phi);
+        pos[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
+        pos[i*3+2] = r * Math.cos(theta);
+      }
+
+      var geo  = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      var mat  = new THREE.PointsMaterial({ color: 0x90C13E, size: 0.035, transparent: true, opacity: 0.6 });
+      var pts  = new THREE.Points(geo, mat);
+      scene.add(pts);
+
+      var tcx = 0, tcy = 0;
+      document.addEventListener('mousemove', function (e) {
+        tcx =  ((e.clientX / window.innerWidth)  - 0.5) * 0.6;
+        tcy = -((e.clientY / window.innerHeight) - 0.5) * 0.6;
+      });
+
+      (function animate() {
+        requestAnimationFrame(animate);
+        pts.rotation.y += 0.0004;
+        pts.rotation.x += 0.0002;
+        camera.position.x += (tcx - camera.position.x) * 0.05;
+        camera.position.y += (tcy - camera.position.y) * 0.05;
+        renderer.render(scene, camera);
+      })();
+
+      window.addEventListener('resize', function () {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      });
+
+      window.addEventListener('beforeunload', function () {
+        renderer.dispose(); geo.dispose(); mat.dispose();
+      });
+    } catch (err) {
+      console.warn('Hero Three.js error:', err);
+    }
+  })();
+
+  /* ====================================================
+     THREE.JS — ORBIT RINGS
+  ==================================================== */
+  (function () {
+    if (typeof THREE === 'undefined') return;
+    try {
+      var canvas = document.getElementById('orbit-canvas');
+      if (!canvas) return;
+
+      var w = canvas.offsetWidth  || 400;
+      var h = canvas.offsetHeight || 400;
+
+      var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(w, h);
+
+      var scene  = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+      camera.position.z = 4;
+
+      var t1g = new THREE.TorusGeometry(1.8, 0.012, 16, 200);
+      var t1m = new THREE.MeshBasicMaterial({ color: 0x90C13E, transparent: true, opacity: 0.7 });
+      var t1  = new THREE.Mesh(t1g, t1m);
+      scene.add(t1);
+
+      var t2g = new THREE.TorusGeometry(1.8, 0.012, 16, 200);
+      var t2m = new THREE.MeshBasicMaterial({ color: 0x659A41, transparent: true, opacity: 0.4 });
+      var t2  = new THREE.Mesh(t2g, t2m);
+      t2.rotation.x = Math.PI / 3;
+      scene.add(t2);
+
+      var nodeg = new THREE.SphereGeometry(0.06, 8, 8);
+      var nodem = new THREE.MeshBasicMaterial({ color: 0x90C13E });
+      var nodes = [];
+      for (var i = 0; i < 6; i++) {
+        var node  = new THREE.Mesh(nodeg, nodem);
+        var angle = (i / 6) * Math.PI * 2;
+        node.position.set(1.8 * Math.cos(angle), 1.8 * Math.sin(angle), 0);
+        nodes.push({ mesh: node, angle: angle });
+        scene.add(node);
+      }
+
+      (function animate() {
+        requestAnimationFrame(animate);
+        t1.rotation.y += 0.008;
+        t1.rotation.z += 0.003;
+        t2.rotation.y += 0.008;
+        t2.rotation.z -= 0.003;
+        nodes.forEach(function (n) {
+          n.angle += 0.008;
+          n.mesh.position.set(1.8 * Math.cos(n.angle), 1.8 * Math.sin(n.angle), 0);
+        });
+        renderer.render(scene, camera);
+      })();
+
+      window.addEventListener('resize', function () {
+        var nw = canvas.offsetWidth || 400;
+        renderer.setSize(nw, nw);
+      });
+
+      window.addEventListener('beforeunload', function () {
+        renderer.dispose();
+        t1g.dispose(); t1m.dispose(); t2g.dispose(); t2m.dispose();
+        nodeg.dispose(); nodem.dispose();
+      });
+    } catch (err) {
+      console.warn('Orbit Three.js error:', err);
+    }
+  })();
+  </script>
+
+</body>
+</html>
