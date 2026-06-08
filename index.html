@@ -271,8 +271,25 @@
       position: absolute; bottom: 0; left: 0; right: 0;
       display: flex; gap: 4px; padding: 4px; background: rgba(0,0,0,0.5); overflow-x: auto;
     }
-    .gallery-thumb { width: 52px; height: 40px; object-fit: cover; border-radius: 4px; opacity: 0.75; transition: opacity 0.2s; flex-shrink: 0; }
+    .gallery-thumb { width: 52px; height: 40px; object-fit: cover; border-radius: 4px; opacity: 0.75; transition: opacity 0.2s; flex-shrink: 0; cursor: zoom-in; }
     .gallery-thumb:hover { opacity: 1; }
+
+    /* Lightbox */
+    #lb-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.92); align-items: center; justify-content: center; cursor: zoom-out;
+    }
+    #lb-overlay.active { display: flex; }
+    #lb-img {
+      max-width: 92vw; max-height: 90vh; object-fit: contain;
+      border-radius: 6px; box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+      cursor: default;
+    }
+    #lb-close {
+      position: absolute; top: 16px; right: 22px; font-size: 2rem; color: #fff;
+      background: none; border: none; cursor: pointer; line-height: 1; opacity: 0.8;
+    }
+    #lb-close:hover { opacity: 1; }
 
     .category-chip {
       position: absolute; top: 12px; left: 12px; z-index: 2;
@@ -613,7 +630,7 @@
             <img class="project-primary-img" src="MoH_1.jpeg" alt="Lesotho GIS Health Catchments Map" loading="lazy" style="transform:rotate(-90deg);object-fit:cover;" />
             <div class="project-gallery-strip">
               <img class="gallery-thumb" src="MoH_2.jpeg" alt="Gallery" loading="lazy" />
-              <img class="gallery-thumb" src="MoH_3.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="MoH_3.jpeg" alt="Gallery" loading="lazy" style="transform:rotate(90deg);" />
               <img class="gallery-thumb" src="MoH_5.jpeg" alt="Gallery" loading="lazy" />
             </div>
             <span class="category-chip">Health GIS</span>
@@ -721,7 +738,7 @@
               <img class="gallery-thumb" src="MoH_T2.jpeg" alt="Gallery" loading="lazy" />
               <img class="gallery-thumb" src="MoH_T3.jpeg" alt="Gallery" loading="lazy" />
               <img class="gallery-thumb" src="MoH_T4.jpeg" alt="Gallery" loading="lazy" />
-              <img class="gallery-thumb" src="MoL_3.jpeg" alt="Gallery" loading="lazy" />
+              <img class="gallery-thumb" src="MoL_3.jpeg" alt="Gallery" loading="lazy" style="transform:rotate(90deg);" />
             </div>
             <span class="category-chip">Health GIS</span>
           </div>
@@ -1459,7 +1476,61 @@
       console.warn('Orbit Three.js error:', err);
     }
   })();
+
+  /* ====================================================
+     LIGHTBOX
+  ==================================================== */
+  (function () {
+    var overlay = document.getElementById('lb-overlay');
+    var lbImg   = document.getElementById('lb-img');
+    var lbClose = document.getElementById('lb-close');
+
+    function openLightbox(src) {
+      lbImg.src = src;
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      overlay.classList.remove('active');
+      lbImg.src = '';
+      document.body.style.overflow = '';
+    }
+
+    // click on primary image
+    document.querySelectorAll('.project-primary-img').forEach(function (img) {
+      img.style.cursor = 'zoom-in';
+      img.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openLightbox(img.src);
+      });
+    });
+
+    // click on thumbnail
+    document.querySelectorAll('.gallery-thumb').forEach(function (thumb) {
+      thumb.addEventListener('click', function (e) {
+        // swap handled elsewhere; open after small delay so swap completes
+        setTimeout(function () {
+          var card = thumb.closest('.project-card');
+          var primary = card ? card.querySelector('.project-primary-img') : null;
+          if (primary) openLightbox(primary.src);
+        }, 50);
+      });
+    });
+
+    // close on overlay background or button
+    overlay.addEventListener('click', closeLightbox);
+    lbImg.addEventListener('click', function (e) { e.stopPropagation(); });
+    lbClose.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+  })();
   </script>
+
+<div id="lb-overlay">
+  <button id="lb-close" aria-label="Close">&times;</button>
+  <img id="lb-img" src="" alt="Full size image" />
+</div>
 
 </body>
 </html>
